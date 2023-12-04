@@ -52,21 +52,22 @@ class QrCodeDrawable(qrCodeViewModel: QrCodeViewModel) : Drawable() {
     private var textWidth = contentTextPaint.measureText(qrCodeViewModel.qrContent).toInt()
 
     override fun draw(canvas: Canvas) {
-        canvas.drawRect(qrCodeViewModel.boundingRect, boundingRectPaint)
-        canvas.drawRect(
-            Rect(
-                qrCodeViewModel.boundingRect.left,
-                qrCodeViewModel.boundingRect.bottom + contentPadding/2,
-                qrCodeViewModel.boundingRect.left + textWidth + contentPadding*2,
-                qrCodeViewModel.boundingRect.bottom + contentTextPaint.textSize.toInt() + contentPadding),
-            contentRectPaint
-        )
-        canvas.drawText(
-            qrCodeViewModel.qrContent,
-            (qrCodeViewModel.boundingRect.left + contentPadding).toFloat(),
-            (qrCodeViewModel.boundingRect.bottom + contentPadding*2).toFloat(),
-            contentTextPaint
-        )
+//        canvas.drawRect(qrCodeViewModel.boundingRect, boundingRectPaint)
+//        canvas.drawRect(
+//            Rect(
+//                qrCodeViewModel.boundingRect.left,
+//                qrCodeViewModel.boundingRect.bottom + contentPadding/2,
+//                qrCodeViewModel.boundingRect.left + textWidth + contentPadding*2,
+//                qrCodeViewModel.boundingRect.bottom + contentTextPaint.textSize.toInt() + contentPadding),
+//            contentRectPaint
+//        )
+//        canvas.drawText(
+//            qrCodeViewModel.qrContent,
+//            (qrCodeViewModel.boundingRect.left + contentPadding).toFloat(),
+//            (qrCodeViewModel.boundingRect.bottom + contentPadding*2).toFloat(),
+//            contentTextPaint
+//        )
+        drawBoundaries(canvas)
     }
 
     override fun setAlpha(alpha: Int) {
@@ -83,4 +84,50 @@ class QrCodeDrawable(qrCodeViewModel: QrCodeViewModel) : Drawable() {
 
     @Deprecated("Deprecated in Java")
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
+
+    fun drawBoundaries(canvas: Canvas) {
+
+        val paint = Paint()
+        paint.color = Color.RED
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 20f
+        paint.isAntiAlias = true
+
+        // Adjust according to your requirements..
+        val length = canvas.width * 0.25f
+        val corner = length * 0.25f
+        val left = 10f
+        val top = 10f
+        val right = canvas.width - 10f
+        val bottom = canvas.height - 10f
+
+        val path = Path()
+
+        // Top-Left corner..
+        path.moveTo(left, top + length)
+        path.lineTo(left, top + corner)
+        path.cubicTo(left, top + corner, left, top, left + corner, top)
+        path.lineTo(left + length, top)
+
+        // Top-Right corner..
+        path.moveTo(right - length, top)
+        path.lineTo(right - corner, top)
+        path.cubicTo(right - corner, top, right, top, right, top + corner)
+        path.lineTo(right, top + length)
+
+        // Bottom-Right corner..
+        path.moveTo(right, bottom - length)
+        path.lineTo(right, bottom - corner)
+        path.cubicTo(right, bottom - corner, right, bottom, right - corner, bottom)
+        path.lineTo(right - length, bottom)
+
+        // Bottom-Left corner..
+        path.moveTo(left + length, bottom)
+        path.lineTo(left + corner, bottom)
+        path.cubicTo(left + corner, bottom, left, bottom, left, bottom - corner)
+        path.lineTo(left, bottom - length)
+
+        // Draw path..
+        canvas.drawPath(path, paint)
+    }
 }
